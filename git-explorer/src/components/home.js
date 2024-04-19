@@ -1,65 +1,50 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import "./styles.css";
+import {Link} from 'react-router-dom';
 
-const Login = ({ setIsLogged, setUsername }) => {
-  const [loginUsername, setLoginUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  //NAVIGATION
-  const navigate = useNavigate();
-
-  const dummyUserObject = {
-    username: "Kolosafo",
-    password: "12345",
+const RepoList = () => {
+  //State management
+  const [repos, setRepos] = useState(null);
+  const gitRepos = async () => {
+    const response = await axios.get(
+      "https://api.github.com/search/repositories?q=XXX"
+    );
+    console.log(response.data.items);
+    setRepos(response.data.items);
+    return response.data;
   };
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (
-      loginUsername === dummyUserObject.username &&
-      password === dummyUserObject.password
-    ) {
-      setUsername(loginUsername);
-      setIsLogged(true);
-      navigate("/authProfile");
-    } else {
-      setErrorMsg("Invalid Credentials");
-    }
-  };
+  useEffect(() => {
+    gitRepos().catch((e) => console.error(e));
+  }, []);
   return (
-    <form className="login-form" onSubmit={handleLogin}>
-      <span className="error-span">{errorMsg}</span>
-      <label htmlFor="username" className="login-label">
-        Username
-      </label>
-      <input
-        type="text"
-        name="username"
-        value={loginUsername}
-        onChange={(e) => {
-          setLoginUsername(e.target.value);
-          setErrorMsg("");
-        }}
-        className="login-inp"
-        placeholder="username"
-      />
-      <label htmlFor="password" className="login-label">
-        Password
-      </label>
-      <input
-        type="password"
-        name="password"
-        value={password}
-        className="login-inp"
-        onChange={(e) => {
-          setPassword(e.target.value);
-          setErrorMsg("");
-        }}
-        placeholder="password"
-      />
-      <button type="submit">Submit</button>
-    </form>
+    <div className="users-cont">
+      {repos ? (
+        repos.map((repo) => (
+          <div className="user-card-cont" key={repo.id}>
+            <img
+              src={repo.owner.avatar_url}
+              alt="userAvatar"
+              className="user-avatar"
+            />
+            <span className="username">{repo.name}</span>
+
+            <span className="repo-lang-span">Language: {repo.language}</span>
+            <div>
+              By: <button className="repo-owner">{repo.owner.login}</button>
+            </div>
+
+            <button>
+              <button>View Repo</button>
+            </button>
+          </div>
+        ))
+      ) : (
+        <h1>Loading...</h1>
+      )}
+      <Link to="/users">Go to Users Page</Link>
+    </div>
   );
 };
 
-export default Login;
+export default RepoList;
