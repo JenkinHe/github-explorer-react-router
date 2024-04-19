@@ -6,6 +6,7 @@ import AboutUs from "./components/about";
 import Users from "./components/users";
 import Navbar from "./components/navbar";
 import NotFound from "./components/notfound";
+import UserProfile from "./components/userProfile"
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route exact path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/user/:username" element={<UserProfile/>}/>
 
         </Route>
         <Route path="*" element={<NotFound/>}/>
