@@ -4,14 +4,8 @@ import { Route, Routes, Navigate,useLocation } from "react-router-dom";
 import Home from "./components/home";
 import { useState,lazy ,Suspense} from "react";
 import { CSSTransition, SwitchTransition } from "react-transition-group"
+import { appRoutes } from "./routes";
 
-const Users=lazy(()=>import("./components/users"));
-const UserProfile=lazy(()=>import("./components/userProfile"));
-const SearchUser=lazy(()=>import("./components/searchUser"));
-const Login=lazy(()=>import("./components/login"));
-const AuthProfile=lazy(()=>import('./components/authProfile'));
-const AboutUs=lazy(()=>import("./components/about"));
-const NotFound=lazy(()=>import("./components/notfound"));
 
 function App() {
   const [username, setUsername] = useState('');
@@ -24,16 +18,15 @@ function App() {
         <div className="App">
           <Routes location={location}>
             
-              <Route exact path="/" element={<Home />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/users/user/:username" element={<UserProfile />} />
-              <Route path="/search" element={<SearchUser />} />
-              <Route element={<Login setIsLogged={setIsLogged} setUsername={setUsername} />} path="/login" />
-              <Route element={isLogged ? <AuthProfile username={username} /> : <Navigate replace to={"/login"} />} path="/authProfile" />
-
-            
-            <Route path="*" element={<NotFound />} />
+              {
+                appRoutes.map((route)=>{
+                  if(route.requiresAuth&&!isLogged){
+                    return <Route key={route.path} exact path={route.path} element={<Navigate replace to={'/login'}/>}/>
+                  } else{
+                    return <Route key={route.path} exact path={route.path} element={<route.component setIsLogged={setIsLogged} setUsername={setUsername} username={username}/>}/>
+                  }
+                })
+              }
 
 
           </Routes>
